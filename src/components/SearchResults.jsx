@@ -1,42 +1,105 @@
 import React, { useEffect } from "react";
 import PokeCard from "./PokeCard";
+import Loader from "./Loader";
+import { useState, useContext } from "react";
+import { SearchContext } from "../context/context.jsx";
 
-import {
-  useGetPokemonsQuery,
-  useSearchPokemonQuery,
-} from "../services/PokeApi";
-import { useDispatch, useSelector } from "react-redux";
-import { useState } from "react";
 const PAGE_SIZE = 6;
-
+const POKEMON_COUNT = 1302;
 const SearchResults = () => {
-  const searchPokemon = useSelector((state) => state.pokeSearch);
-  const { data: pokeList, isLoading, error } = useGetPokemonsQuery(777);
-  const [currPage, setCurrPage] = useState(1);
+  const [pokeList, setPokeList] = useState([]);
+  const [currPage, setCurrPage] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
+  const { searchInput } = useContext(SearchContext);
+
+  let prevPage;
+  let nextPage;
+  let lastPage = 0;
+  if (searchInput === "") {
+    lastPage = Math.ceil(POKEMON_COUNT / PAGE_SIZE) - 1;
+  }
+  if (currPage === 0) prevPage = null;
+  else
+    prevPage = `https://pokeapi.co/api/v2/pokemon?offset=${
+      currPage * PAGE_SIZE - PAGE_SIZE
+    }&limit=6`;
+  nextPage = `https://pokeapi.co/api/v2/pokemon?offset=${
+    currPage * PAGE_SIZE + PAGE_SIZE
+  }&limit=6`;
+  async function fetchPokemon(url) {
+    try {
+      setIsLoading(true);
+      const res = await fetch(url);
+      const data = await res.json();
+      const imgUrl = data.sprites.other.dream_world.front_default;
+      let finalst = [{ id: data.id, name: data.name, imgSrc: imgUrl }];
+      setPokeList(finalst);
+      setIsLoading(false);
+      setIsError(false);
+    } catch (error) {
+      setIsError(true);
+    }
+  }
+  async function fetchPokemons(url) {
+    try {
+      setIsLoading(true);
+      const res = await fetch(url);
+      const data = await res.json();
+      let finalst = [];
+      for (let i = 0; i < data.results.length; i++) {
+        const pokeres = await fetch(data.results[i].url);
+        const pokedata = await pokeres.json();
+        const url = pokedata.sprites.other.dream_world.front_default;
+        finalst.push({ id: pokedata.id, name: pokedata.name, imgSrc: url });
+      }
+      setPokeList(finalst);
+      setIsLoading(false);
+      setIsError(false);
+    } catch (error) {
+      setIsError(true);
+    }
+  }
   useEffect(() => {
-    setCurrPage(1);
-  }, [searchPokemon.value]);
-  if (isLoading) return <p>Loading</p>;
-  const filteredList = pokeList.results.filter((pokemon) =>
-    pokemon.name.startsWith(searchPokemon.value.toLowerCase())
-  );
-  const lastPage = Math.ceil(filteredList.length / PAGE_SIZE);
-  console.log(lastPage);
-  const startIndex = (currPage - 1) * PAGE_SIZE;
-  const endIndex = startIndex + PAGE_SIZE;
-  const paginatedList = filteredList.slice(startIndex, endIndex);
+    if (searchInput !== "") {
+      setCurrPage(0);
+      fetchPokemon(`https://pokeapi.co/api/v2/pokemon/${searchInput}`);
+      return;
+    }
+    fetchPokemons("https://pokeapi.co/api/v2/pokemon?offset=0&limit=6");
+  }, [searchInput]);
+  function handlePaginationClick(pageDir) {
+    let url;
+    if (pageDir === "prev") {
+      url = prevPage;
+      setCurrPage((prev) => prev - 1);
+    } else {
+      url = nextPage;
+      setCurrPage((prev) => prev + 1);
+    }
+    fetchPokemons(url);
+  }
+
   return (
-    <main className="mt-8 mx-1 mb-1 bg-white rounded-lg py-4 px-2">
-      <div className=" grid grid-cols-3 gap-2">
-        {paginatedList.map((pokemon, index) => (
-          <PokeCard details={pokemon} key={index}></PokeCard>
-        ))}
+    <>
+      <div className="w-full h-[85%] py-4 px-2">
+        {isError ? (
+          <div>Error in loading</div>
+        ) : isLoading ? (
+          <Loader></Loader>
+        ) : (
+          <div className=" grid grid-cols-3 gap-2">
+            {pokeList.map((pokemon) => (
+              <PokeCard details={pokemon} key={pokemon.id}></PokeCard>
+            ))}
+          </div>
+        )}
       </div>
       <div className=" flex justify-around mt-4">
-        {currPage <= 1 ? null : (
+        {currPage === 0 ? null : (
           <div
             className=" p-2 rounded-full hover:bg-neutral-200 duration-300"
-            onClick={() => setCurrPage((currPage) => currPage - 1)}
+            onClick={() => handlePaginationClick("prev")}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -54,10 +117,10 @@ const SearchResults = () => {
             </svg>
           </div>
         )}
-        {currPage >= lastPage ? null : (
+        {currPage === lastPage ? null : (
           <div
             className="p-2 rounded-full hover:bg-neutral-200 duration-300"
-            onClick={() => setCurrPage((currPage) => currPage + 1)}
+            onClick={() => handlePaginationClick("next")}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -76,7 +139,7 @@ const SearchResults = () => {
           </div>
         )}
       </div>
-    </main>
+    </>
   );
 };
 
