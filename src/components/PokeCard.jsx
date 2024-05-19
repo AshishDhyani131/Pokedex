@@ -10,10 +10,10 @@ const PokeCard = ({ details }) => {
   return (
     <Link
       to={`/${details.id}`}
-      className="shadow-md py-4 px-6 flex flex-col items-center  "
+      className="shadow-md py-2 px-2 grid grid-rows-[1fr_2fr_1fr] place-content-center  "
     >
-      <p className="self-end translate-x-3 -translate-y-3">#{number}</p>
-      <div className="w-16 aspect-square">
+      <p className="justify-self-end translate-x-3 -translate-y-3">#{number}</p>
+      <div className="w-12 aspect-square justify-self-center scale-[1.4]">
         <img
           src={details.imgSrc}
           alt="image of pokemon"
