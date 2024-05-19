@@ -1,47 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
-import { useParams } from "react-router-dom";
 import { typesColors } from "../utilities/typeMapping";
-import Loader from "./Loader";
-const PokeDetail = () => {
-  const [pokeData, setPokeData] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isError, setIsError] = useState(false);
-  const { id } = useParams();
 
-  // console.log(typesColors);
-  const colorPrimary = pokeData
-    ? typesColors[pokeData.types[0].type.name]
-    : "white";
-  // console.log(pokeData.types);
-  useEffect(() => {
-    async function fetchPokemon() {
-      try {
-        setIsLoading(true);
-        const res = await fetch(` https://pokeapi.co/api/v2/pokemon/${id}`);
-        const pokeDetail = await res.json();
-        let number = pokeDetail.id;
-        if (number <= 9) {
-          number = `#00${number}`;
-        } else if (number > 9 && number < 99) {
-          number = `#0${number}`;
-        } else {
-          number = `#${number}`;
-        }
-        setPokeData({
-          pokeId: number,
-          pokeName: pokeDetail.name,
-          types: pokeDetail.types,
-          imgSrc: pokeDetail.sprites.other.dream_world.front_default,
-        });
-        setIsLoading(false);
-        setIsError(false);
-      } catch (error) {
-        setIsError(true);
-      }
-    }
-    fetchPokemon();
-  }, []);
+const PokeDetail = () => {
   return (
     <div
       className=" w-full h-full  p-2 "
@@ -165,3 +126,26 @@ const PokeDetail = () => {
 };
 
 export default PokeDetail;
+
+export async function loader(params) {
+  console.log(params);
+  try {
+    const res = await fetch(` https://pokeapi.co/api/v2/pokemon/${id}`);
+    const pokeDetail = await res.json();
+    let number = pokeDetail.id;
+    if (number <= 9) {
+      number = `#00${number}`;
+    } else if (number > 9 && number < 99) {
+      number = `#0${number}`;
+    } else {
+      number = `#${number}`;
+    }
+    setPokeData({
+      pokeId: number,
+      pokeName: pokeDetail.name,
+      types: pokeDetail.types,
+      imgSrc: pokeDetail.sprites.other.dream_world.front_default,
+    });
+  } catch (error) {}
+}
+fetchPokemon();

@@ -1,10 +1,10 @@
-import Header from "./components/Header";
-import SearchResults from "./components/SearchResults";
-
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import PokeDetail from "./components/PokeDetail";
-import HomePage from "./pages/HomePage";
+import HomePage, { loader as pokemonsListLoader } from "./pages/HomePage";
+import PokeDetail, {
+  loader as pokemonDetailLoader,
+} from "./components/PokeDetail";
 import RootLayout from "./pages/Root";
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -13,6 +13,12 @@ const router = createBrowserRouter([
       {
         index: true,
         element: <HomePage></HomePage>,
+        loader: pokemonsListLoader,
+      },
+      {
+        path: "pokemon/:id",
+        element: <PokeDetail></PokeDetail>,
+        loader: pokemonDetailLoader,
       },
     ],
   },

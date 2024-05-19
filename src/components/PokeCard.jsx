@@ -20,7 +20,7 @@ const PokeCard = ({ details }) => {
           className="w-full aspect-square"
         />
       </div>
-      <h2 className=" mt-2 text-[14px] font-semibold capitalize">
+      <h2 className=" mt-2 text-[14px] font-semibold capitalize line-clamp-1">
         {details.name}
       </h2>
     </Link>
