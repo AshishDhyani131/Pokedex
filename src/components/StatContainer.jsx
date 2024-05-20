@@ -8,6 +8,7 @@ const StatContainer = ({ baseStats, primaryColor, primaryColorLight }) => {
           <p
             className="text-xs uppercase font-bold mt-1  text-right pr-4"
             style={{ color: primaryColor }}
+            key={stat[0]}
           >
             {stat[0]}
           </p>
@@ -15,7 +16,10 @@ const StatContainer = ({ baseStats, primaryColor, primaryColorLight }) => {
       </div>
       <div className="pl-3">
         {baseStats.map((stat) => (
-          <div className="grid grid-cols-[1fr_9fr] gap-3 mt-1 items-center">
+          <div
+            className="grid grid-cols-[1fr_9fr] gap-3 mt-1 items-center"
+            key={stat[0]}
+          >
             <p className="text-xs text-end">{stat[1]}</p>
             <div
               className="w-full h-2 rounded-full relative z-0 overflow-hidden"

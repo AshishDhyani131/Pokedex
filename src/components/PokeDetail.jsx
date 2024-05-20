@@ -8,7 +8,9 @@ import StatContainer from "./StatContainer";
 import { IoArrowBackOutline } from "react-icons/io5";
 import { LiaWeightHangingSolid } from "react-icons/lia";
 import { TfiRuler } from "react-icons/tfi";
-
+import { MdNavigateNext } from "react-icons/md";
+import { MdNavigateBefore } from "react-icons/md";
+import { useParams, useNavigate } from "react-router-dom";
 const statsMap = {
   hp: "hp",
   attack: "atk",
@@ -19,13 +21,33 @@ const statsMap = {
 };
 const PokeDetail = () => {
   const pokeData = useLoaderData();
-  console.log(pokeData);
-
+  const id = Number(useParams().id);
+  const navigate = useNavigate();
+  // console.log(pokeData);
+  function handleClick(step) {
+    if (step === "next") {
+      navigate(`/pokemon/${id + 1}`);
+    } else if (step === "back") navigate(`/pokemon/${id - 1}`);
+  }
   const primaryColor = typesColors[pokeData.types[0].type.name][0];
   const primaryColorLight = typesColors[pokeData.types[0].type.name][1];
   return (
     <GridLayout style={{ backgroundColor: primaryColor }}>
-      <div className="w-32 aspect-square absolute left-1/2 -translate-x-1/2 top-[13%]">
+      <div className="absolute  text-white w-full justify-between px-4 top-[18%] text-3xl">
+        {id !== 1 && (
+          <MdNavigateBefore
+            className="absolute left-3"
+            onClick={() => handleClick("back")}
+          />
+        )}
+        {id !== 1000 && (
+          <MdNavigateNext
+            className="absolute right-3"
+            onClick={() => handleClick("next")}
+          />
+        )}
+      </div>
+      <div className="w-32 aspect-square absolute left-1/2 -translate-x-1/2 top-[13%] object-cover">
         <img
           src={pokeData.imgSrc}
           alt={pokeData.pokeName}
@@ -125,7 +147,9 @@ export async function loader({ params }) {
       pokeId: number,
       pokeName: pokeDetail.name,
       types: pokeDetail.types,
-      imgSrc: pokeDetail.sprites.other.dream_world.front_default,
+      imgSrc:
+        pokeDetail.sprites.other.dream_world.front_default ||
+        pokeDetail.sprites.front_default,
       weight: pokeDetail.weight,
       height: pokeDetail.height,
       ability: pokeDetail.abilities[0].ability.name,

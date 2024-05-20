@@ -1,9 +1,11 @@
 import React from "react";
 
 const GridLayout = ({ children, ...props }) => {
-  const className = `w-screen h-screen grid grid-rows-rootLayout rounded-md`;
   return (
-    <div className={className} {...props}>
+    <div
+      className="w-screen h-screen  relative grid grid-rows-rootLayout rounded-md sm:w-[300px] sm:h-[460px]"
+      {...props}
+    >
       {children}
     </div>
   );
