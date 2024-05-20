@@ -9,7 +9,7 @@ const PokeCard = ({ details }) => {
   }
   return (
     <Link
-      to={`/${details.id}`}
+      to={`pokemon/${details.id}`}
       className="shadow-md py-2 px-2 grid grid-rows-[1fr_2fr_1fr] place-content-center  "
     >
       <p className="justify-self-end translate-x-3 -translate-y-3">#{number}</p>

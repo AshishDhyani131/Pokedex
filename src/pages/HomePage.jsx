@@ -1,5 +1,5 @@
 import React, { useContext, useState } from "react";
-import HomePageLayout from "../layouts/HomePageLayout";
+import GridLayout from "../layouts/GridLayout";
 import Header from "../components/Header";
 import PokeList from "../components/PokeList";
 import { useLoaderData } from "react-router-dom";
@@ -13,7 +13,7 @@ const HomePage = () => {
 
   const pokeList = useLoaderData();
   const filteredList = pokeList.filter((pokemon) =>
-    pokemon.name.includes(searchInput)
+    pokemon.name.includes(searchInput.toLowerCase())
   );
 
   const firstPage = 1;
@@ -23,7 +23,7 @@ const HomePage = () => {
   const finalst = filteredList.slice(start, end);
 
   return (
-    <HomePageLayout>
+    <GridLayout style={{ backgroundColor: "#DC0A2D" }}>
       <Header></Header>
       <PokeList
         pokeList={finalst}
@@ -31,7 +31,7 @@ const HomePage = () => {
         isLastPage={currPage >= lastPage}
         setCurrPage={setCurrPage}
       ></PokeList>
-    </HomePageLayout>
+    </GridLayout>
   );
 };
 
@@ -52,7 +52,7 @@ export async function loader() {
       const url = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${
         i + 1
       }.png`;
-      finalst.push({ id: i, name: results[i].name, imgSrc: url });
+      finalst.push({ id: i + 1, name: results[i].name, imgSrc: url });
     }
 
     localStorage.setItem("pokemons", JSON.stringify(finalst));
